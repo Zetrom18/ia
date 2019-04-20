@@ -78,8 +78,10 @@ vertice *cria_vertice(int cor, int x, int y){
 }
 
 void adiciona_vizinho(vertice *a, vertice *b){
-  adiciona_item(a->vizinhos, b);
-  adiciona_item(b->vizinhos, a);
+  if(a!=b){
+    adiciona_item(a->vizinhos, b);
+    adiciona_item(b->vizinhos, a);
+  }
 }
 
 grafo* cria_grafo(map_t *map){
@@ -112,7 +114,7 @@ grafo* cria_grafo(map_t *map){
   return g;
 }
 
-void fundir(vertice *a, vertice *b){
+void fundir(grafo *g, vertice *a, vertice *b){
   while(b->vizinhos->tam != 0){
     if(acha_item(a->vizinhos, b->vizinhos->head)==NULL){
       adiciona_vizinho(a, b->vizinhos->head->conteudo);
@@ -121,6 +123,7 @@ void fundir(vertice *a, vertice *b){
     remove_item(b->vizinhos, b->vizinhos->head->conteudo);
   }
   a->tam += b->tam;
+  remove_item(g->vertices, b);
   free(b->vizinhos);
   free(b);
 }
@@ -130,7 +133,7 @@ void fundir_todos(grafo *g){
   for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
     for(vizinho = ((vertice *)aux->conteudo)->vizinhos->head; vizinho!=NULL; vizinho = vizinho->prox){
       if(((vertice *)aux->conteudo)->cor == ((vertice *)vizinho->conteudo)->cor){
-        fundir((vertice *)aux->conteudo, (vertice *)vizinho->conteudo);
+        fundir(g, (vertice *)aux->conteudo, (vertice *)vizinho->conteudo);
       }
     }
   }

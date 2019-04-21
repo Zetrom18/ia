@@ -5,11 +5,17 @@
 int main(int argc, char const *argv[]) {
   map_t *map = readMap();
 
-  printMap(map);
+  // printMap(map);
 
   grafo *g = cria_grafo(map);
 
+  printf("%d\n", checa_grafo(g));
+
   fundir_todos(g);
+
+  printf("%d\n", checa_grafo(g));
+
+  destroi_grafo(g);
 
   puts("Done");
 

@@ -38,11 +38,15 @@ void remove_item(lista *l, void *conteudo){
         l->head = aux->prox;
         if(aux->prox != NULL){
           aux->prox->ante = NULL;
+        }else{
+          l->tail = NULL;
         }
       }else if(aux == l->tail){
         l->tail = aux->ante;
         if(aux->ante != NULL){
           aux->ante->prox = NULL;
+        }else{
+          l->head = NULL;
         }
       }else{
         aux->ante->prox = aux->prox;
@@ -58,12 +62,21 @@ void remove_item(lista *l, void *conteudo){
 }
 
 item *acha_item(lista *l, void *conteudo){
-  for(item *aux=l->head; aux!=NULL; aux=aux->prox){
+  item *aux;
+  for(aux = l->head; aux!=NULL; aux = aux->prox){
     if(aux->conteudo==conteudo){
       return aux;
     }
   }
   return NULL;
+}
+
+void destroi_lista(lista *l){
+  item *x;
+  for(x = l->head; x!=NULL; x = l->head){
+    remove_item(l, x->conteudo);
+  }
+  free(l);
 }
 
 vertice *cria_vertice(int cor, int x, int y){
@@ -75,6 +88,11 @@ vertice *cria_vertice(int cor, int x, int y){
   v->coord_y = y;
   v->vizinhos = cria_lista();
   return v;
+}
+
+void destroi_vertice(vertice *v){
+  destroi_lista(v->vizinhos);
+  free(v);
 }
 
 void adiciona_vizinho(vertice *a, vertice *b){
@@ -114,6 +132,18 @@ grafo* cria_grafo(map_t *map){
   return g;
 }
 
+void destroi_grafo(grafo *g){
+  item *x;
+  vertice *v;
+  for(x = g->vertices->head; g->vertices->head != NULL; x = g->vertices->head){
+    v = (vertice *)x->conteudo;
+    remove_item(g->vertices, (void *)v);
+    destroi_vertice(v);
+  }
+  destroi_lista(g->vertices);
+  free(g);
+}
+
 void fundir(grafo *g, vertice *a, vertice *b){
   while(b->vizinhos->tam != 0){
     if(acha_item(a->vizinhos, b->vizinhos->head)==NULL){
@@ -137,4 +167,100 @@ void fundir_todos(grafo *g){
       }
     }
   }
+}
+
+int checa_grafo(grafo *g){
+  item *aux;
+  int cont = 0;
+  for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
+    cont += ((vertice *)aux->conteudo)->tam;
+  }
+  return cont;
+}
+
+no *cria_no(vertice *v){
+  no *n = (no *)malloc(sizeof(no));
+  assert(n);
+  n->conteudo = v;
+  n->filhos = cria_lista();
+  n->nivel = -1;
+  return n;
+}
+
+arvore* cria_arvore(){
+  arvore *t = (arvore *)malloc(sizeof(arvore));
+  assert(t);
+  t->raiz = NULL;
+  t->altura = 0;
+  return t;
+}
+
+int adiciona_no(arvore *t, no *pai, no *filho){
+  if(pai == NULL){
+    t->raiz = filho;
+    filho->nivel = 0;
+  }else if(filho->nivel == -1){
+    adiciona_item(pai->filhos, (void *)filho);
+    filho->nivel = pai->nivel + 1;
+  }else{
+
+  }
+  return filho->nivel;
+}
+
+no* acha_no(arvore *t, vertice *v){
+  no *n;
+  lista *l = cria_lista();
+  adiciona_item(l, (void *)t->raiz);
+  for(item *aux = l->head; aux!=NULL; aux = l->head){
+    n = (no *)aux;
+    if(n->conteudo == v){
+      destroi_lista(l);
+      return n;
+    }
+    for(item *x = n->filhos->head; x!=NULL; x = x->prox){
+      adiciona_item(l, (vertice *)((no *)x->conteudo)->conteudo);
+    }
+    remove_item(l, l->head->conteudo);
+  }
+  destroi_lista(l);
+  return NULL;
+}
+
+arvore* gera_arvore(vertice *v){
+  int altura;
+  item *aux, *vaux;
+  arvore *t = cria_arvore();
+  lista *l = cria_lista();
+  t->altura = 1 + adiciona_no(t, NULL, cria_no(v));
+  adiciona_item(l, (void *)v);
+  for(aux = l->head; aux!=NULL; aux = aux->prox){
+    for(vaux = ((vertice *)aux->conteudo)->vizinhos->head; vaux!=NULL; vaux = vaux->prox){
+      if(acha_item(l, (void *)vaux->conteudo)==NULL){
+        adiciona_item(l, (void *)vaux->conteudo);
+        altura = 1 + adiciona_no(t, acha_no(t, ((vertice *)aux->conteudo)), cria_no((vertice *)vaux->conteudo));
+        if(altura > t->altura){
+          t->altura = altura;
+        }
+      }
+    }
+  }
+  destroi_lista(l);
+  return t;
+}
+
+arvore* econtra_melhor_arvore(grafo *g){
+  item *aux;
+  arvore *best, *taux;
+  int tam_best = MAX_INT;
+  for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
+    taux = gera_arvore((vertice *)aux->conteudo);
+    if(taux->altura < tam_best){
+      // destroi_arvore(best);
+      best = taux;
+      tam_best = best->altura;
+    }
+  }
+  // destroi_grafo(g);
+  return best;
 }

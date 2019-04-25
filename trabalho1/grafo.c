@@ -34,6 +34,7 @@ void remove_item(lista *l, void *conteudo){
   item *aux;
   for(aux = l->head; aux!=NULL; aux = aux->prox){
     if(aux->conteudo==conteudo){
+      aux->conteudo = NULL;
       if(aux == l->head){
         l->head = aux->prox;
         if(aux->prox != NULL){
@@ -56,6 +57,7 @@ void remove_item(lista *l, void *conteudo){
       l->tam--;
 
       free(aux);
+      aux = NULL;
       return;
     }
   }
@@ -77,6 +79,7 @@ void destroi_lista(lista *l){
     remove_item(l, x->conteudo);
   }
   free(l);
+  l = NULL;
 }
 
 vertice *cria_vertice(int cor, int x, int y){
@@ -93,6 +96,7 @@ vertice *cria_vertice(int cor, int x, int y){
 void destroi_vertice(vertice *v){
   destroi_lista(v->vizinhos);
   free(v);
+  v = NULL;
 }
 
 void adiciona_vizinho(vertice *a, vertice *b){
@@ -142,6 +146,7 @@ void destroi_grafo(grafo *g){
   }
   destroi_lista(g->vertices);
   free(g);
+  g = NULL;
 }
 
 void fundir(grafo *g, vertice *a, vertice *b){
@@ -155,7 +160,9 @@ void fundir(grafo *g, vertice *a, vertice *b){
   a->tam += b->tam;
   remove_item(g->vertices, b);
   free(b->vizinhos);
+  b->vizinhos = NULL;
   free(b);
+  b = NULL;
 }
 
 void fundir_todos(grafo *g){
@@ -193,6 +200,7 @@ void destroi_no(no *n){
   }
   destroi_lista(n->filhos);
   free(n);
+  n = NULL;
 }
 
 arvore* cria_arvore(){
@@ -206,6 +214,7 @@ arvore* cria_arvore(){
 void destroi_arvore(arvore *t){
   destroi_no(t->raiz);
   free(t);
+  t = NULL;
 }
 
 int adiciona_no(arvore *t, no *pai, no *filho){
@@ -213,9 +222,6 @@ int adiciona_no(arvore *t, no *pai, no *filho){
     t->raiz = filho;
     filho->nivel = 0;
   }else if(filho->nivel == -1){
-    puts("AAAAA");
-    printf("x: %p\n", pai);
-    printf("x: %p\n", pai->filhos);
     adiciona_item(pai->filhos, (void *)filho);
     filho->nivel = pai->nivel + 1;
   }else{
@@ -232,12 +238,16 @@ no* acha_no(arvore *t, vertice *v){
       destroi_lista(l);
       return (no *)aux->conteudo;
     }
+    // O problema é que a lista filhos do no raiz aparentemente ficou null do nada
+    puts("AQUI");
     for(item *x = ((no *)aux->conteudo)->filhos->head; x!=NULL; x = x->prox){
       adiciona_item(l, (vertice *)((no *)x->conteudo)->conteudo);
     }
+    puts("NAO");
     remove_item(l, l->head->conteudo);
   }
   destroi_lista(l);
+
   return NULL;
 }
 

@@ -56,10 +56,12 @@ void fundir(grafo *, vertice *, vertice *);
 void fundir_todos(grafo *);
 int checa_grafo(grafo *);
 no *cria_no(vertice *);
+void destroi_no(no *);
 arvore* cria_arvore();
+void destroi_arvore(arvore *);
 int adiciona_no(arvore *, no *, no *);
 no* acha_no(arvore *, vertice *);
 arvore* gera_arvore(vertice *);
-arvore* econtra_melhor_arvore(grafo *);
+arvore* encontra_melhor_arvore(grafo *);
 
 #endif

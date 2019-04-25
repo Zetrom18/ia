@@ -187,6 +187,14 @@ no *cria_no(vertice *v){
   return n;
 }
 
+void destroi_no(no *n){
+  for(item *aux=n->filhos->head; aux!=NULL; aux=aux->prox){
+    destroi_no(aux->conteudo);
+  }
+  destroi_lista(n->filhos);
+  free(n);
+}
+
 arvore* cria_arvore(){
   arvore *t = (arvore *)malloc(sizeof(arvore));
   assert(t);
@@ -195,30 +203,36 @@ arvore* cria_arvore(){
   return t;
 }
 
+void destroi_arvore(arvore *t){
+  destroi_no(t->raiz);
+  free(t);
+}
+
 int adiciona_no(arvore *t, no *pai, no *filho){
   if(pai == NULL){
     t->raiz = filho;
     filho->nivel = 0;
   }else if(filho->nivel == -1){
+    puts("AAAAA");
+    printf("x: %p\n", pai);
+    printf("x: %p\n", pai->filhos);
     adiciona_item(pai->filhos, (void *)filho);
     filho->nivel = pai->nivel + 1;
   }else{
-
+    // adicao de um filho ja inserido na arvore nao sera implementada
   }
   return filho->nivel;
 }
 
 no* acha_no(arvore *t, vertice *v){
-  no *n;
   lista *l = cria_lista();
   adiciona_item(l, (void *)t->raiz);
   for(item *aux = l->head; aux!=NULL; aux = l->head){
-    n = (no *)aux;
-    if(n->conteudo == v){
+    if(((vertice *)((no *)aux->conteudo)->conteudo) == v){
       destroi_lista(l);
-      return n;
+      return (no *)aux->conteudo;
     }
-    for(item *x = n->filhos->head; x!=NULL; x = x->prox){
+    for(item *x = ((no *)aux->conteudo)->filhos->head; x!=NULL; x = x->prox){
       adiciona_item(l, (vertice *)((no *)x->conteudo)->conteudo);
     }
     remove_item(l, l->head->conteudo);
@@ -238,7 +252,7 @@ arvore* gera_arvore(vertice *v){
     for(vaux = ((vertice *)aux->conteudo)->vizinhos->head; vaux!=NULL; vaux = vaux->prox){
       if(acha_item(l, (void *)vaux->conteudo)==NULL){
         adiciona_item(l, (void *)vaux->conteudo);
-        altura = 1 + adiciona_no(t, acha_no(t, ((vertice *)aux->conteudo)), cria_no((vertice *)vaux->conteudo));
+        altura = 1 + adiciona_no(t, acha_no(t, (vertice *)aux->conteudo), cria_no((vertice *)vaux->conteudo));
         if(altura > t->altura){
           t->altura = altura;
         }
@@ -249,18 +263,18 @@ arvore* gera_arvore(vertice *v){
   return t;
 }
 
-arvore* econtra_melhor_arvore(grafo *g){
+arvore* encontra_melhor_arvore(grafo *g){
   item *aux;
   arvore *best, *taux;
   int tam_best = MAX_INT;
   for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
     taux = gera_arvore((vertice *)aux->conteudo);
+    printf("%d\n", taux->altura);
     if(taux->altura < tam_best){
-      // destroi_arvore(best);
+      destroi_arvore(best);
       best = taux;
       tam_best = best->altura;
     }
   }
-  // destroi_grafo(g);
   return best;
 }

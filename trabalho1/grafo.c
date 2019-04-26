@@ -214,8 +214,10 @@ arvore* cria_arvore(){
 }
 
 void destroi_arvore(arvore *t){
-  destroi_no(t->raiz);
-  free(t);
+  if(t!=NULL){
+    destroi_no(t->raiz);
+    free(t);
+  }
 }
 
 int adiciona_no(arvore *t, no *pai, no *filho){
@@ -236,19 +238,16 @@ no* acha_no(arvore *t, vertice *v){
   adiciona_item(l, (void *)t->raiz);
   for(item *aux = l->head; aux!=NULL; aux = l->head){
     if(((vertice *)((no *)aux->conteudo)->conteudo) == v){
+      no *n = (no *)aux->conteudo;
       destroi_lista(l);
-      return (no *)aux->conteudo;
+      return n;
     }
-    // O problema é que a lista filhos do no raiz aparentemente ficou null do nada
-    puts("AQUI");
     for(item *x = ((no *)aux->conteudo)->filhos->head; x!=NULL; x = x->prox){
-      adiciona_item(l, (vertice *)((no *)x->conteudo)->conteudo);
+      adiciona_item(l, (no *)x->conteudo);
     }
-    puts("NAO");
     remove_item(l, l->head->conteudo);
   }
   destroi_lista(l);
-
   return NULL;
 }
 
@@ -263,7 +262,9 @@ arvore* gera_arvore(vertice *v){
     for(vaux = ((vertice *)aux->conteudo)->vizinhos->head; vaux!=NULL; vaux = vaux->prox){
       if(acha_item(l, (void *)vaux->conteudo)==NULL){
         adiciona_item(l, (void *)vaux->conteudo);
-        altura = 1 + adiciona_no(t, acha_no(t, (vertice *)aux->conteudo), cria_no((vertice *)vaux->conteudo));
+        no *a = acha_no(t, (vertice *)aux->conteudo);
+        no *b = cria_no((vertice *)vaux->conteudo);
+        altura = 1 + adiciona_no(t, a, b);
         if(altura > t->altura){
           t->altura = altura;
         }
@@ -276,11 +277,11 @@ arvore* gera_arvore(vertice *v){
 
 arvore* encontra_melhor_arvore(grafo *g){
   item *aux;
-  arvore *best, *taux;
+  arvore *best=NULL, *taux;
   int tam_best = MAX_INT;
   for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
     taux = gera_arvore((vertice *)aux->conteudo);
-    // printf("%d\n", taux->altura);
+    printf("%d\n", taux->altura);
     if(taux->altura < tam_best){
       destroi_arvore(best);
       best = taux;
@@ -289,3 +290,5 @@ arvore* encontra_melhor_arvore(grafo *g){
   }
   return best;
 }
+
+vertice* encontra_melhor_vertice(){}

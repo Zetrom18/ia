@@ -15,9 +15,10 @@ int main(int argc, char const *argv[]) {
 
   printf("%d\n", checa_grafo(g));
 
-  arvore *t = encontra_melhor_arvore(g);
+  // arvore *t = encontra_melhor_arvore(g);
+  arvore *t = gera_arvore(encontra_melhor_vertice(g));
 
-  printf("%d\n", t->altura);
+  imprime_solucao(floodit(t));
 
   destroi_arvore(t);
 

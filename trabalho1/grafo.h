@@ -42,11 +42,19 @@ typedef struct arvore {
   int altura;
 } arvore;
 
+typedef struct jogo {
+  int x;
+  int y;
+  int n_jogadas;
+  int *jogadas;
+} jogo;
+
 lista* cria_lista();
 void adiciona_item(lista *, void *);
 void remove_item(lista *, void *);
 item *acha_item(lista *, void *);
 void destroi_lista(lista *);
+int tamanho_lista(lista *);
 vertice *cria_vertice(int, int, int);
 void destroi_vertice(vertice *);
 void adiciona_vizinho(vertice *, vertice *);
@@ -63,5 +71,11 @@ int adiciona_no(arvore *, no *, no *);
 no* acha_no(arvore *, vertice *);
 arvore* gera_arvore(vertice *);
 arvore* encontra_melhor_arvore(grafo *);
+vertice* encontra_melhor_vertice(grafo *);
+jogo* cria_jogo(arvore *, int);
+int encontra_melhor_cor(no *);
+void pinta(arvore *, int);
+jogo *floodit(arvore *);
+void imprime_solucao(jogo *);
 
 #endif

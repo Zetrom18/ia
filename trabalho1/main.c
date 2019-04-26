@@ -15,13 +15,11 @@ int main(int argc, char const *argv[]) {
 
   printf("%d\n", checa_grafo(g));
 
-  // descomente para gerar erros!!
-  //
-  // arvore *t = encontra_melhor_arvore(g);
-  //
-  // printf("%d\n", t->altura);
-  //
-  // destroi_arvore(t);
+  arvore *t = encontra_melhor_arvore(g);
+
+  printf("%d\n", t->altura);
+
+  destroi_arvore(t);
 
   destroi_grafo(g);
 

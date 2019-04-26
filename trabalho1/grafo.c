@@ -56,8 +56,8 @@ void remove_item(lista *l, void *conteudo){
 
       l->tam--;
 
+      aux->conteudo = NULL;
       free(aux);
-      aux = NULL;
       return;
     }
   }
@@ -79,7 +79,14 @@ void destroi_lista(lista *l){
     remove_item(l, x->conteudo);
   }
   free(l);
-  l = NULL;
+}
+
+int tamanho_lista(lista *l){
+  int count = 0;
+  for(item *aux = l->head; aux != NULL; aux = aux->prox){
+    count++;
+  }
+  return count;
 }
 
 vertice *cria_vertice(int cor, int x, int y){
@@ -96,7 +103,6 @@ vertice *cria_vertice(int cor, int x, int y){
 void destroi_vertice(vertice *v){
   destroi_lista(v->vizinhos);
   free(v);
-  v = NULL;
 }
 
 void adiciona_vizinho(vertice *a, vertice *b){
@@ -146,12 +152,11 @@ void destroi_grafo(grafo *g){
   }
   destroi_lista(g->vertices);
   free(g);
-  g = NULL;
 }
 
 void fundir(grafo *g, vertice *a, vertice *b){
   while(b->vizinhos->tam != 0){
-    if(acha_item(a->vizinhos, b->vizinhos->head)==NULL){
+    if(acha_item(a->vizinhos, b->vizinhos->head->conteudo)==NULL){
       adiciona_vizinho(a, b->vizinhos->head->conteudo);
     }
     remove_item(((vertice *)b->vizinhos->head->conteudo)->vizinhos, b);
@@ -160,9 +165,7 @@ void fundir(grafo *g, vertice *a, vertice *b){
   a->tam += b->tam;
   remove_item(g->vertices, b);
   free(b->vizinhos);
-  b->vizinhos = NULL;
   free(b);
-  b = NULL;
 }
 
 void fundir_todos(grafo *g){
@@ -200,7 +203,6 @@ void destroi_no(no *n){
   }
   destroi_lista(n->filhos);
   free(n);
-  n = NULL;
 }
 
 arvore* cria_arvore(){
@@ -214,7 +216,6 @@ arvore* cria_arvore(){
 void destroi_arvore(arvore *t){
   destroi_no(t->raiz);
   free(t);
-  t = NULL;
 }
 
 int adiciona_no(arvore *t, no *pai, no *filho){
@@ -279,7 +280,7 @@ arvore* encontra_melhor_arvore(grafo *g){
   int tam_best = MAX_INT;
   for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
     taux = gera_arvore((vertice *)aux->conteudo);
-    printf("%d\n", taux->altura);
+    // printf("%d\n", taux->altura);
     if(taux->altura < tam_best){
       destroi_arvore(best);
       best = taux;

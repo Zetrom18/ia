@@ -1,5 +1,5 @@
 #!/bin/bash
 
 gcc grafo.c map.c main.c -o teste -O3
-./geramapa 100 100 3 > tmp.map
+./geramapa 10 10 3 > tmp.map
 time ./teste < tmp.map

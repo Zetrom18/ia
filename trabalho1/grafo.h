@@ -70,6 +70,7 @@ void destroi_arvore(arvore *);
 int adiciona_no(arvore *, no *, no *);
 no* acha_no(arvore *, vertice *);
 arvore* gera_arvore(vertice *);
+int checa_arvore(no *);
 arvore* encontra_melhor_arvore(grafo *);
 vertice* encontra_melhor_vertice(grafo *);
 jogo* cria_jogo(arvore *, int);

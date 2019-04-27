@@ -224,11 +224,12 @@ int adiciona_no(arvore *t, no *pai, no *filho){
   if(pai == NULL){
     t->raiz = filho;
     filho->nivel = 0;
-  }else if(filho->nivel == -1){
+  }else if(filho->nivel == -1 || pai->nivel < filho->nivel -1){
     adiciona_item(pai->filhos, (void *)filho);
     filho->nivel = pai->nivel + 1;
   }else{
     // adicao de um filho ja inserido na arvore nao sera implementada
+    puts("UNEXPECTED");
   }
   return filho->nivel;
 }
@@ -275,13 +276,21 @@ arvore* gera_arvore(vertice *v){
   return t;
 }
 
+int checa_arvore(no *n){
+  int soma = n->conteudo->tam;
+  for(item *aux = n->filhos->head; aux != NULL; aux = aux->prox){
+    soma += checa_arvore((no *)aux->conteudo);
+  }
+  return soma;
+}
+
 arvore* encontra_melhor_arvore(grafo *g){
   item *aux;
   arvore *best=NULL, *taux;
   int tam_best = MAX_INT;
   for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
     taux = gera_arvore((vertice *)aux->conteudo);
-    printf("%d\n", taux->altura);
+    printf("%d\n", taux->altura); // DEBUG
     if(taux->altura < tam_best){
       destroi_arvore(best);
       best = taux;
@@ -317,7 +326,7 @@ jogo* cria_jogo(arvore *t, int tam){
 int encontra_melhor_cor(no *r){
   int vizinhos[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   for(item *aux = r->filhos->head; aux!=NULL; aux = aux->prox){
-    vizinhos[((no *)aux->conteudo)->conteudo->cor-1] += ((no *)aux->conteudo)->filhos->tam;
+    vizinhos[((no *)aux->conteudo)->conteudo->cor-1] += ((no *)aux->conteudo)->filhos->tam + 1;
   }
   int melhor = 0;
   for(int i=1; i<10; i++){

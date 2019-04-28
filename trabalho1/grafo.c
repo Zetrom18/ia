@@ -345,17 +345,21 @@ void pinta(grafo *g, vertice *v, int cor){
   item *aux = v->vizinhos->head;
   v->cor = cor;
   while(aux!=NULL){
-    while(b->vizinhos->tam != 0){
-      if(acha_item(v->vizinhos, b->vizinhos->head->conteudo)==NULL){
-        adiciona_vizinho(v, b->vizinhos->head->conteudo);
+    b = ((vertice *)aux->conteudo);
+    aux = aux->prox;
+    if (b->cor == cor) {
+      while(b->vizinhos->tam != 0){
+        if(acha_item(v->vizinhos, b->vizinhos->head->conteudo)==NULL){
+          adiciona_vizinho(v, b->vizinhos->head->conteudo);
+        }
+        remove_item(((vertice *)b->vizinhos->head->conteudo)->vizinhos, b);
+        remove_item(b->vizinhos, b->vizinhos->head->conteudo);
       }
-      remove_item(((vertice *)b->vizinhos->head->conteudo)->vizinhos, b);
-      remove_item(b->vizinhos, b->vizinhos->head->conteudo);
+      v->tam += b->tam;
+      remove_item(g->vertices, b);
+      free(b->vizinhos);
+      free(b);
     }
-    v->tam += b->tam;
-    remove_item(g->vertices, b);
-    free(b->vizinhos);
-    free(b);
   }
 }
 

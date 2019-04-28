@@ -326,10 +326,10 @@ jogo* cria_jogo(vertice *v, int tam){
   return j;
 }
 
-int encontra_melhor_cor(no *r){
+int encontra_melhor_cor(vertice *v){
   int vizinhos[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  for(item *aux = r->filhos->head; aux!=NULL; aux = aux->prox){
-    vizinhos[((no *)aux->conteudo)->conteudo->cor-1] += ((no *)aux->conteudo)->filhos->tam + 1;
+  for(item *aux = v->vizinhos->head; aux!=NULL; aux = aux->prox){
+    vizinhos[((vertice *)aux->conteudo)->cor-1] += ((vertice *)aux->conteudo)->vizinhos->tam + 1;
   }
   int melhor = 0;
   for(int i=1; i<10; i++){
@@ -340,66 +340,45 @@ int encontra_melhor_cor(no *r){
   return melhor+1;
 }
 
-// jogo* cria_jogo(arvore *t, int tam){
-//   jogo *j = (jogo *)malloc(sizeof(jogo));
-//   assert(j);
-//   j->x = t->raiz->conteudo->coord_x;
-//   j->y = t->raiz->conteudo->coord_y;
-//   j->n_jogadas = 0;
-//   j->jogadas = (int *)malloc(sizeof(int)*tam);
-//   assert(j->jogadas);
-//   return j;
-// }
-//
-// int encontra_melhor_cor(no *r){
-//   int vizinhos[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-//   for(item *aux = r->filhos->head; aux!=NULL; aux = aux->prox){
-//     vizinhos[((no *)aux->conteudo)->conteudo->cor-1] += ((no *)aux->conteudo)->filhos->tam + 1;
-//   }
-//   int melhor = 0;
-//   for(int i=1; i<10; i++){
-//     if(vizinhos[melhor] < vizinhos[i]){
-//       melhor = i;
-//     }
-//   }
-//   return melhor+1;
-// }
-//
-// void pinta(arvore *t, int cor){
-//   no *b;
-//   item *aux = t->raiz->filhos->head;
-//   t->raiz->conteudo->cor = cor;
-//   while(aux!=NULL){
-//     b = ((no *)aux->conteudo);
-//     aux = aux->prox;
-//     if(b->conteudo->cor == cor){
-//       while(b->filhos->tam != 0){
-//         adiciona_no(t, t->raiz, (no *)b->filhos->head->conteudo);
-//         remove_item(b->filhos, b->filhos->head->conteudo);
-//       }
-//       t->raiz->conteudo->tam += b->conteudo->tam;
-//       remove_item(t->raiz->filhos, (void *)b);
-//       destroi_no(b);
-//     }
-//   }
-// }
-//
-// jogo* floodit(arvore *t){
-//   int tam_max = 8, cor;
-//   jogo *j = cria_jogo(t, tam_max);
-//   while(t->raiz->filhos->tam > 0){
-//     cor = encontra_melhor_cor(t->raiz);
-//     pinta(t, cor);
-//     if(j->n_jogadas >= tam_max){
-//       tam_max = tam_max*2;
-//       j->jogadas = (int *)realloc(j->jogadas, sizeof(int)*tam_max);
-//       assert(j->jogadas);
-//     }
-//     j->jogadas[j->n_jogadas] = cor;
-//     j->n_jogadas++;
-//   }
-//   return j;
-// }
+void pinta(grafo *g, vertice *v, int cor){
+  vertice *b;
+  item *aux = v->vizinhos->head;
+  v->cor = cor;
+  while(aux!=NULL){
+    b = ((vertice *)aux->conteudo);
+    aux = aux->prox;
+    if (b->cor == cor) {
+      while(b->vizinhos->tam != 0){
+        if(acha_item(v->vizinhos, b->vizinhos->head->conteudo)==NULL){
+          adiciona_vizinho(v, b->vizinhos->head->conteudo);
+        }
+        remove_item(((vertice *)b->vizinhos->head->conteudo)->vizinhos, b);
+        remove_item(b->vizinhos, b->vizinhos->head->conteudo);
+      }
+      v->tam += b->tam;
+      remove_item(g->vertices, b);
+      free(b->vizinhos);
+      free(b);
+    }
+  }
+}
+
+jogo* floodit(vertice *v, grafo *g){
+  int tam_max = 8, cor;
+  jogo *j = cria_jogo(v, tam_max);
+  while(v->vizinhos->tam > 0){
+    cor = encontra_melhor_cor(v);
+    pinta(g, v, cor);
+    if(j->n_jogadas >= tam_max){
+      tam_max = tam_max*2;
+      j->jogadas = (int *)realloc(j->jogadas, sizeof(int)*tam_max);
+      assert(j->jogadas);
+    }
+    j->jogadas[j->n_jogadas] = cor;
+    j->n_jogadas++;
+  }
+  return j;
+}
 
 void imprime_solucao(jogo *j){
   printf("%d %d %d\n", j->x, j->y, j->n_jogadas);

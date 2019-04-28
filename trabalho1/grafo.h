@@ -73,10 +73,10 @@ arvore* gera_arvore(vertice *);
 int checa_arvore(no *);
 arvore* encontra_melhor_arvore(grafo *);
 vertice* encontra_melhor_vertice(grafo *);
-jogo* cria_jogo(arvore *, int);
-int encontra_melhor_cor(no *);
-void pinta(arvore *, int);
-jogo *floodit(arvore *);
+jogo* cria_jogo(vertice *, int);
+int encontra_melhor_cor(vertice *);
+void pinta(grafo *g, vertice *, int);
+jogo *floodit(vertice *, grafo *);
 void imprime_solucao(jogo *);
 
 #endif

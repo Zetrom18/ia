@@ -327,17 +327,37 @@ jogo* cria_jogo(vertice *v, int tam){
 }
 
 int encontra_melhor_cor(vertice *v){
-  int vizinhos[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  for(item *aux = v->vizinhos->head; aux!=NULL; aux = aux->prox){
-    vizinhos[((vertice *)aux->conteudo)->cor-1] += ((vertice *)aux->conteudo)->vizinhos->tam + 1;
-  }
-  int melhor = 0;
-  for(int i=1; i<10; i++){
-    if(vizinhos[melhor] < vizinhos[i]){
-      melhor = i;
+  int vizinhos[10][10] = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+  };
+  vertice *ver1, *ver2;
+  item *aux, *bux;
+  for(aux = v->vizinhos->head; aux!=NULL; aux = aux->prox){
+    ver1 = ((vertice *)aux->conteudo);
+    for (bux = ((vertice *)aux->conteudo)->vizinhos->head; bux!=NULL; bux = bux->prox) {
+      ver2 = ((vertice *)bux->conteudo);
+      vizinhos[ver1->cor - 1][ver2->cor - 1] += ver2->tam;
     }
   }
-  return melhor+1;
+  int melhor1 = 0, melhor2 = 0;
+  for(int i=0; i<10; i++){
+    for(int j=0; j<10; j++) {
+      if(vizinhos[melhor1][melhor2] < vizinhos[i][j]){
+        melhor1 = i;
+        melhor2 = j;
+      }
+    }
+  }
+  return melhor1+1;
 }
 
 void pinta(grafo *g, vertice *v, int cor){
@@ -367,6 +387,7 @@ jogo* floodit(vertice *v, grafo *g){
   int tam_max = 8, cor;
   jogo *j = cria_jogo(v, tam_max);
   while(v->vizinhos->tam > 0){
+    printf("%d\n", v->vizinhos->tam);
     cor = encontra_melhor_cor(v);
     pinta(g, v, cor);
     if(j->n_jogadas >= tam_max){

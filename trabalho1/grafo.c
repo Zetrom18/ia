@@ -326,13 +326,54 @@ jogo* cria_jogo(vertice *v, int tam){
   return j;
 }
 
-int encontra_melhor_cor(vertice *v){
-  int vizinhos[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  for(item *aux = v->vizinhos->head; aux!=NULL; aux = aux->prox){
-    vizinhos[((vertice *)aux->conteudo)->cor-1] += ((vertice *)aux->conteudo)->vizinhos->tam + 1;
+int pega_altura(lista *l, vertice *v){
+  int h;
+  int altura = 1;
+  for(item *aux=v->vizinhos->head; aux!=NULL; aux=aux->prox){
+    if(acha_item(l, aux->conteudo)==NULL){
+      adiciona_item(l, aux->conteudo);
+      h = pega_altura(l, (vertice *)aux->conteudo) + 1;
+      if(h > altura){
+        altura = h;
+      }
+    }
   }
+  return altura;
+}
+
+int busca_altura(vertice *v, int cor){
+  puts("dale");
+  int h;
+  int altura=MAX_INT;
+  lista *l = cria_lista();
+  adiciona_item(l, (void *)v);
+  for(item *aux=v->vizinhos->head; aux!=NULL; aux=aux->prox){
+    adiciona_item(l, aux->conteudo);
+  }
+  for(item *aux=v->vizinhos->head; aux!=NULL; aux=aux->prox){
+    if(((vertice *)aux->conteudo)->cor == cor){
+      h = pega_altura(l, (vertice *)aux->conteudo);
+    }else{
+      h = pega_altura(l, (vertice *)aux->conteudo) + 1;
+    }
+    if(h < altura){
+      altura = h;
+    }
+  }
+  destroi_lista(l);
+  return altura;
+}
+
+int encontra_melhor_cor(vertice *v){
+  puts("oi?");
+  int vizinhos[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  // for(item *aux = v->vizinhos->head; aux!=NULL; aux = aux->prox){
+  //   vizinhos[((vertice *)aux->conteudo)->cor-1] += ((vertice *)aux->conteudo)->vizinhos->tam + 1;
+  // }
   int melhor = 0;
+  vizinhos[melhor] = busca_altura(v, 1);
   for(int i=1; i<10; i++){
+    vizinhos[i] = busca_altura(v, i+1);
     if(vizinhos[melhor] < vizinhos[i]){
       melhor = i;
     }
@@ -367,6 +408,7 @@ jogo* floodit(vertice *v, grafo *g){
   int tam_max = 8, cor;
   jogo *j = cria_jogo(v, tam_max);
   while(v->vizinhos->tam > 0){
+    puts("aqui?");
     cor = encontra_melhor_cor(v);
     pinta(g, v, cor);
     if(j->n_jogadas >= tam_max){

@@ -387,7 +387,6 @@ jogo* floodit(vertice *v, grafo *g){
   int tam_max = 8, cor;
   jogo *j = cria_jogo(v, tam_max);
   while(v->vizinhos->tam > 0){
-    printf("%d\n", v->vizinhos->tam);
     cor = encontra_melhor_cor(v);
     pinta(g, v, cor);
     if(j->n_jogadas >= tam_max){

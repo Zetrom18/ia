@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+//Cria uma lista vazia
 lista* cria_lista(){
   lista *l = (lista *)malloc(sizeof(lista));
   assert(l);
@@ -12,6 +13,7 @@ lista* cria_lista(){
   return l;
 }
 
+//Adiciona item a lista
 void adiciona_item(lista *l, void *conteudo){
   item *x = (item *)malloc(sizeof(item));
   assert(x);
@@ -30,6 +32,7 @@ void adiciona_item(lista *l, void *conteudo){
   }
 }
 
+//Remove item da lista
 void remove_item(lista *l, void *conteudo){
   item *aux;
   for(aux = l->head; aux!=NULL; aux = aux->prox){
@@ -63,6 +66,7 @@ void remove_item(lista *l, void *conteudo){
   }
 }
 
+//Procura item em uma lista
 item *acha_item(lista *l, void *conteudo){
   item *aux;
   for(aux = l->head; aux!=NULL; aux = aux->prox){
@@ -73,6 +77,7 @@ item *acha_item(lista *l, void *conteudo){
   return NULL;
 }
 
+//Destroi e desaloca lista
 void destroi_lista(lista *l){
   item *x;
   for(x = l->head; x!=NULL; x = l->head){
@@ -81,14 +86,7 @@ void destroi_lista(lista *l){
   free(l);
 }
 
-int tamanho_lista(lista *l){ // DEBUG
-  int count = 0;
-  for(item *aux = l->head; aux != NULL; aux = aux->prox){
-    count++;
-  }
-  return count;
-}
-
+//Cria um vértice
 vertice *cria_vertice(int cor, int x, int y){
   vertice *v = (vertice *)malloc(sizeof(vertice));
   assert(v);
@@ -100,11 +98,13 @@ vertice *cria_vertice(int cor, int x, int y){
   return v;
 }
 
+//Destroi um vértice
 void destroi_vertice(vertice *v){
   destroi_lista(v->vizinhos);
   free(v);
 }
 
+//Adiciona vizinhanca entre vértices
 void adiciona_vizinho(vertice *a, vertice *b){
   if(a!=b){
     adiciona_item(a->vizinhos, b);
@@ -112,6 +112,7 @@ void adiciona_vizinho(vertice *a, vertice *b){
   }
 }
 
+//Cria um grafo a partir de um map lido
 grafo* cria_grafo(map_t *map){
   vertice *v = NULL;
   grafo *g = (grafo *)malloc(sizeof(grafo));
@@ -142,6 +143,7 @@ grafo* cria_grafo(map_t *map){
   return g;
 }
 
+//Destroi e desaloca um grafo
 void destroi_grafo(grafo *g){
   item *x;
   vertice *v;
@@ -154,6 +156,7 @@ void destroi_grafo(grafo *g){
   free(g);
 }
 
+//Funde dois vértices de mesma cor
 void fundir(grafo *g, vertice *a, vertice *b){
   while(b->vizinhos->tam != 0){
     if(acha_item(a->vizinhos, b->vizinhos->head->conteudo)==NULL){
@@ -168,6 +171,7 @@ void fundir(grafo *g, vertice *a, vertice *b){
   free(b);
 }
 
+//Aglutina todos os vértices próximos de mesma cor
 void fundir_todos(grafo *g){
   item *aux, *vizinho, *vizinhoprox;
   for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
@@ -182,127 +186,8 @@ void fundir_todos(grafo *g){
   }
 }
 
-int checa_grafo(grafo *g){
-  item *aux;
-  int cont = 0;
-  for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
-    cont += ((vertice *)aux->conteudo)->tam;
-  }
-  return cont;
-}
 
-no *cria_no(vertice *v){
-  no *n = (no *)malloc(sizeof(no));
-  assert(n);
-  n->conteudo = v;
-  n->filhos = cria_lista();
-  n->nivel = -1;
-  return n;
-}
-
-void destroi_no(no *n){
-  for(item *aux=n->filhos->head; aux!=NULL; aux=aux->prox){
-    destroi_no(aux->conteudo);
-  }
-  destroi_lista(n->filhos);
-  free(n);
-}
-
-arvore* cria_arvore(){
-  arvore *t = (arvore *)malloc(sizeof(arvore));
-  assert(t);
-  t->raiz = NULL;
-  t->altura = 0;
-  return t;
-}
-
-void destroi_arvore(arvore *t){
-  if(t!=NULL){
-    destroi_no(t->raiz);
-    free(t);
-  }
-}
-
-int adiciona_no(arvore *t, no *pai, no *filho){
-  if(pai == NULL){
-    t->raiz = filho;
-    filho->nivel = 0;
-  }else if(filho->nivel == -1 || pai->nivel < filho->nivel -1){
-    adiciona_item(pai->filhos, (void *)filho);
-    filho->nivel = pai->nivel + 1;
-  }else{
-    // adicao de um filho ja inserido na arvore nao sera implementada
-    puts("UNEXPECTED");
-  }
-  return filho->nivel;
-}
-
-no* acha_no(arvore *t, vertice *v){
-  lista *l = cria_lista();
-  adiciona_item(l, (void *)t->raiz);
-  for(item *aux = l->head; aux!=NULL; aux = l->head){
-    if(((vertice *)((no *)aux->conteudo)->conteudo) == v){
-      no *n = (no *)aux->conteudo;
-      destroi_lista(l);
-      return n;
-    }
-    for(item *x = ((no *)aux->conteudo)->filhos->head; x!=NULL; x = x->prox){
-      adiciona_item(l, (no *)x->conteudo);
-    }
-    remove_item(l, l->head->conteudo);
-  }
-  destroi_lista(l);
-  return NULL;
-}
-
-arvore* gera_arvore(vertice *v){
-  int altura;
-  item *aux, *vaux;
-  arvore *t = cria_arvore();
-  lista *l = cria_lista();
-  t->altura = 1 + adiciona_no(t, NULL, cria_no(v));
-  adiciona_item(l, (void *)v);
-  for(aux = l->head; aux!=NULL; aux = aux->prox){
-    for(vaux = ((vertice *)aux->conteudo)->vizinhos->head; vaux!=NULL; vaux = vaux->prox){
-      if(acha_item(l, (void *)vaux->conteudo)==NULL){
-        adiciona_item(l, (void *)vaux->conteudo);
-        no *a = acha_no(t, (vertice *)aux->conteudo);
-        no *b = cria_no((vertice *)vaux->conteudo);
-        altura = 1 + adiciona_no(t, a, b);
-        if(altura > t->altura){
-          t->altura = altura;
-        }
-      }
-    }
-  }
-  destroi_lista(l);
-  return t;
-}
-
-int checa_arvore(no *n){
-  int soma = n->conteudo->tam;
-  for(item *aux = n->filhos->head; aux != NULL; aux = aux->prox){
-    soma += checa_arvore((no *)aux->conteudo);
-  }
-  return soma;
-}
-
-arvore* encontra_melhor_arvore(grafo *g){
-  item *aux;
-  arvore *best=NULL, *taux;
-  int tam_best = MAX_INT;
-  for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
-    taux = gera_arvore((vertice *)aux->conteudo);
-    printf("%d\n", taux->altura); // DEBUG
-    if(taux->altura < tam_best){
-      destroi_arvore(best);
-      best = taux;
-      tam_best = best->altura;
-    }
-  }
-  return best;
-}
-
+//Encontra o melhor vértice para iniciar a pintura procurando o vértice de maior tamanho (mais células de mesma cor juntas)
 vertice* encontra_melhor_vertice(grafo *g){
   int tamanho = 0;
   vertice *v = NULL;
@@ -315,6 +200,7 @@ vertice* encontra_melhor_vertice(grafo *g){
   return v;
 }
 
+//Aloca a estrutura do jogo para retorno
 jogo* cria_jogo(vertice *v, int tam){
   jogo *j = (jogo *)malloc(sizeof(jogo));
   assert(j);
@@ -326,6 +212,8 @@ jogo* cria_jogo(vertice *v, int tam){
   return j;
 }
 
+//Encontra melhor cor para pintar o vértice raiz
+//A heurística utilizada foi encontrar a cor com mais vizinhos de segundo grau (vizinho de vizinho) de mesma cor
 int encontra_melhor_cor(vertice *v){
   int vizinhos[10][10] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -360,6 +248,7 @@ int encontra_melhor_cor(vertice *v){
   return melhor1+1;
 }
 
+//Pinta o vértice raíz
 void pinta(grafo *g, vertice *v, int cor){
   vertice *b;
   item *aux = v->vizinhos->head;
@@ -383,6 +272,7 @@ void pinta(grafo *g, vertice *v, int cor){
   }
 }
 
+//Roda o algoritmo
 jogo* floodit(vertice *v, grafo *g){
   int tam_max = 8, cor;
   jogo *j = cria_jogo(v, tam_max);
@@ -400,6 +290,7 @@ jogo* floodit(vertice *v, grafo *g){
   return j;
 }
 
+//Imprime a solução do algoritmo
 void imprime_solucao(jogo *j){
   printf("%d %d %d\n", j->x, j->y, j->n_jogadas);
   for (int i = 0; i < j->n_jogadas; i++) {

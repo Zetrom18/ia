@@ -7,18 +7,23 @@
 
 #include "map.h"
 
+//Estruturas de Dados Utilizadas:
+
+//Item de uma Lista
 typedef struct item {
   void *conteudo;
   struct item *ante;
   struct item *prox;
 } item;
 
+//tamanho_lista
 typedef struct lista {
   item *head;
   item *tail;
   int tam;
 } lista;
 
+//Vértice de um grafo
 typedef struct vertice {
   int cor;
   int tam;
@@ -27,21 +32,12 @@ typedef struct vertice {
   lista *vizinhos;
 } vertice;
 
+//Grafo
 typedef struct grafo {
   lista *vertices;
 } grafo;
 
-typedef struct no {
-  vertice *conteudo;
-  lista *filhos;
-  int nivel;
-} no;
-
-typedef struct arvore {
-  no *raiz;
-  int altura;
-} arvore;
-
+//Resultado do algoritmo para retorno
 typedef struct jogo {
   int x;
   int y;
@@ -54,7 +50,6 @@ void adiciona_item(lista *, void *);
 void remove_item(lista *, void *);
 item *acha_item(lista *, void *);
 void destroi_lista(lista *);
-int tamanho_lista(lista *);
 vertice *cria_vertice(int, int, int);
 void destroi_vertice(vertice *);
 void adiciona_vizinho(vertice *, vertice *);
@@ -62,16 +57,6 @@ grafo* cria_grafo(map_t *);
 void destroi_grafo(grafo *);
 void fundir(grafo *, vertice *, vertice *);
 void fundir_todos(grafo *);
-int checa_grafo(grafo *);
-no *cria_no(vertice *);
-void destroi_no(no *);
-arvore* cria_arvore();
-void destroi_arvore(arvore *);
-int adiciona_no(arvore *, no *, no *);
-no* acha_no(arvore *, vertice *);
-arvore* gera_arvore(vertice *);
-int checa_arvore(no *);
-arvore* encontra_melhor_arvore(grafo *);
 vertice* encontra_melhor_vertice(grafo *);
 jogo* cria_jogo(vertice *, int);
 int encontra_melhor_cor(vertice *);

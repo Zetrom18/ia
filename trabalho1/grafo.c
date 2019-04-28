@@ -169,12 +169,15 @@ void fundir(grafo *g, vertice *a, vertice *b){
 }
 
 void fundir_todos(grafo *g){
-  item *aux, *vizinho;
+  item *aux, *vizinho, *vizinhoprox;
   for(aux = g->vertices->head; aux!=NULL; aux = aux->prox){
-    for(vizinho = ((vertice *)aux->conteudo)->vizinhos->head; vizinho!=NULL; vizinho = vizinho->prox){
+    vizinho = ((vertice *)aux->conteudo)->vizinhos->head;
+    while(vizinho!=NULL){
+      vizinhoprox = vizinho->prox;
       if(((vertice *)aux->conteudo)->cor == ((vertice *)vizinho->conteudo)->cor){
         fundir(g, (vertice *)aux->conteudo, (vertice *)vizinho->conteudo);
       }
+      vizinho = vizinhoprox;
     }
   }
 }

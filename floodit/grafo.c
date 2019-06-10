@@ -186,7 +186,6 @@ void fundir_todos(grafo *g){
   }
 }
 
-<<<<<<< HEAD:trabalho1/grafo.c
 int checa_grafo(grafo *g){
   item *aux;
   int cont = 0;
@@ -307,8 +306,6 @@ int checa_grafo(grafo *g){
 //   }
 //   return best;
 // }
-=======
->>>>>>> 38be630684e377cd66b68ce89fded02c5f1792df:floodit/grafo.c
 
 //Encontra o melhor vértice para iniciar a pintura procurando o vértice de maior tamanho (mais células de mesma cor juntas)
 vertice* encontra_melhor_vertice(grafo *g){
@@ -335,7 +332,6 @@ jogo* cria_jogo(vertice *v, int tam){
   return j;
 }
 
-<<<<<<< HEAD:trabalho1/grafo.c
 int pega_altura(lista *l, vertice *v){
   int h;
   int altura = 1;
@@ -386,7 +382,6 @@ int encontra_melhor_cor(vertice *v){
     vizinhos[i] = busca_altura(v, i+1);
     if(vizinhos[melhor] < vizinhos[i]){
       melhor = i;
-=======
 //Encontra melhor cor para pintar o vértice raiz
 //A heurística utilizada foi encontrar a cor com mais vizinhos de segundo grau (vizinho de vizinho) de mesma cor
 int encontra_melhor_cor(vertice *v){
@@ -418,7 +413,6 @@ int encontra_melhor_cor(vertice *v){
         melhor1 = i;
         melhor2 = j;
       }
->>>>>>> 38be630684e377cd66b68ce89fded02c5f1792df:floodit/grafo.c
     }
   }
   return melhor1+1;
@@ -453,7 +447,6 @@ jogo* floodit(vertice *v, grafo *g){
   int tam_max = 8, cor;
   jogo *j = cria_jogo(v, tam_max);
   while(v->vizinhos->tam > 0){
-    puts("aqui?");
     cor = encontra_melhor_cor(v);
     pinta(g, v, cor);
     if(j->n_jogadas >= tam_max){
@@ -473,5 +466,5 @@ void imprime_solucao(jogo *j){
   for (int i = 0; i < j->n_jogadas; i++) {
     printf("%d ", j->jogadas[i]);
   }
-  puts("");
+  printf("\n");
 }

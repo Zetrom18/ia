@@ -13,7 +13,7 @@ redisContext* inicia(int argc, char **argv, char *lado, int *jogadas, char *temp
   redisContext *rediscontext;
   char *ip;
   int porta;
-  
+
   if(argc < 4) {
     printf("formato:\n");
     printf("         %s lado jogadas tempo [ip porta]\n\n", argv[0]);
@@ -26,13 +26,13 @@ redisContext* inicia(int argc, char **argv, char *lado, int *jogadas, char *temp
     printf("          o valor default é 10001\n");
     exit(1);
   }
-  
+
   *lado = argv[1][0];
   *jogadas = atoi(argv[2]);
   strcpy(tempo, argv[3]);
   ip = (argc > 4) ? argv[4] : "127.0.0.1";
   porta = (argc > 5) ? atoi(argv[5]) : 10001;
-  
+
   rediscontext = redisConnect(ip, porta);
   if (rediscontext == NULL || rediscontext->err) {
     if(rediscontext) {
@@ -43,7 +43,7 @@ redisContext* inicia(int argc, char **argv, char *lado, int *jogadas, char *temp
     }
   }
   return rediscontext;
-}  
+}
 
 int pos_valida(int l, int c) {
   if(l < 1 || l > 6 || c < 1 || c > 6)
@@ -84,7 +84,7 @@ int parse(char *jogada, char *lado, char *tipo,
       if(!(s = strtok(NULL, " \n")) || sscanf(s, "%d", &(mov_c[i])) != 1)
 	return 0;
     }
-  }    
+  }
   p = 0;
   p += sprintf(&(jogada[p]), "%c %c", *lado, *tipo);
   if(*tipo == 's')
@@ -191,11 +191,11 @@ int main(int argc, char **argv) {
     "#oooooo#\n"
     "#oooooo#\n"
     "########\n";
-    
+
   c = inicia(argc, argv, &quem_joga, &num_jogadas, timeout);
 
   vencedor = ' ';
-  
+
   printf("%d:\n%s", num_jogadas, tabuleiro);
 
   sprintf(buffer, "%c\n%c n\n%s", quem_joga, OUTRO(quem_joga), tabuleiro);
@@ -206,7 +206,7 @@ int main(int argc, char **argv) {
     freeReplyObject(r);
     r = redisCommand(c, "RPUSH %s %s", key, buffer);
     freeReplyObject(r);
-    
+
     ok = 0;
     sprintf(key, "jogada_%c", quem_joga);
     r = redisCommand(c, "BLPOP %s %s", key, timeout);
@@ -215,8 +215,8 @@ int main(int argc, char **argv) {
       if(parse(jogada, &lado, &tipo_mov, &num_mov, mov_l, mov_c) &&
 	 quem_joga == lado &&
 	 aplica(buffer, tabuleiro, lado, tipo_mov, num_mov, mov_l, mov_c)) {
-	strcpy(tabuleiro, buffer);
-	ok = 1;
+      	strcpy(tabuleiro, buffer);
+      	ok = 1;
       }
     }
     freeReplyObject(r);
@@ -231,7 +231,7 @@ int main(int argc, char **argv) {
       vencedor = quem_joga;
       break;
     }
-    
+
     quem_joga = OUTRO(quem_joga);
     sprintf(buffer, "%c\n%s\n%s", quem_joga, jogada, tabuleiro);
     num_jogadas--;
@@ -247,6 +247,6 @@ int main(int argc, char **argv) {
 
   if(num_jogadas == 0)
     printf("empate\n");
-  else    
+  else
     printf("vencedor: %c\n", vencedor);
 }

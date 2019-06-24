@@ -14,4 +14,4 @@ jogador: tabuleiro.h tabuleiro.c jogador.c
 kk18-lrs13: tabuleiro.h tabuleiro.c kk18-lrs13.c
 
 clean:
-	rm -f controlador exemplo1 exemplo2
+	rm -f controlador exemplo1 exemplo2 kk18-lrs13

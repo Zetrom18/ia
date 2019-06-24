@@ -116,6 +116,26 @@ void goDeep(info game, jump **jl, int *jc, jump *bj, int l, int c){
     }
   }
   jump *aux;
+  // Check down
+  if(l<SIDSIZ-2 && game.table[l+1][c]==game.player && game.table[l+2][c]!=game.player){
+    aux = copyJump(bj);
+    aux->score += game.table[l+2][c]=='-' ? 0 : 1;
+    aux->tuples[aux->tCount][0] = l+2;
+    aux->tuples[aux->tCount][1] = c;
+    aux->tCount++;
+    jl[(*jc)++] = aux;
+    goDeep(game, jl, jc, aux, l+2, c);
+  }
+  // Check up
+  if(l>1 && game.table[l-1][c]==game.player && game.table[l-2][c]!=game.player){
+    aux = copyJump(bj);
+    aux->score += game.table[l-2][c]=='-' ? 0 : 1;
+    aux->tuples[aux->tCount][0] = l-2;
+    aux->tuples[aux->tCount][1] = c;
+    aux->tCount++;
+    jl[(*jc)++] = aux;
+    goDeep(game, jl, jc, aux, l-2, c);
+  }
   // Check left
   if(c>1 && game.table[l][c-1]==game.player && game.table[l][c-2]!=game.player){
     aux = copyJump(bj);
@@ -135,26 +155,6 @@ void goDeep(info game, jump **jl, int *jc, jump *bj, int l, int c){
     aux->tCount++;
     jl[(*jc)++] = aux;
     goDeep(game, jl, jc, aux, l, c+2);
-  }
-  // Check up
-  if(l>1 && game.table[l-1][c]==game.player && game.table[l-2][c]!=game.player){
-    aux = copyJump(bj);
-    aux->score += game.table[l-2][c]=='-' ? 0 : 1;
-    aux->tuples[aux->tCount][0] = l-2;
-    aux->tuples[aux->tCount][1] = c;
-    aux->tCount++;
-    jl[(*jc)++] = aux;
-    goDeep(game, jl, jc, aux, l-2, c);
-  }
-  // Check down
-  if(l<SIDSIZ-2 && game.table[l+1][c]==game.player && game.table[l+2][c]!=game.player){
-    aux = copyJump(bj);
-    aux->score += game.table[l+2][c]=='-' ? 0 : 1;
-    aux->tuples[aux->tCount][0] = l+2;
-    aux->tuples[aux->tCount][1] = c;
-    aux->tCount++;
-    jl[(*jc)++] = aux;
-    goDeep(game, jl, jc, aux, l+2, c);
   }
 }
 
@@ -179,6 +179,18 @@ play **getAllPlays(info game, int start_l, int start_c){
   play **allPlays = (play **)calloc(MAXINT, sizeof(play *));
   addJumps(game, allPlays, &playCount, start_l, start_c);
 
+  // Check down
+  if(start_l<SIDSIZ-1){
+    if(game.table[start_l+1][start_c]=='-'){
+      allPlays[playCount++] = newMove(game.player, start_l, start_c, start_l+1, start_c);
+    }
+  }
+  // Check up
+  if(start_l>0){
+    if(game.table[start_l-1][start_c]=='-'){
+      allPlays[playCount++] = newMove(game.player, start_l, start_c, start_l-1, start_c);
+    }
+  }
   // Check left
   if(start_c>0){
     if(game.table[start_l][start_c-1]=='-'){
@@ -189,18 +201,6 @@ play **getAllPlays(info game, int start_l, int start_c){
   if(start_c<SIDSIZ-1){
     if(game.table[start_l][start_c+1]=='-'){
       allPlays[playCount++] = newMove(game.player, start_l, start_c, start_l, start_c+1);
-    }
-  }
-  // Check up
-  if(start_l>0){
-    if(game.table[start_l-1][start_c]=='-'){
-      allPlays[playCount++] = newMove(game.player, start_l, start_c, start_l-1, start_c);
-    }
-  }
-  // Check down
-  if(start_l<SIDSIZ-1){
-    if(game.table[start_l+1][start_c]=='-'){
-      allPlays[playCount++] = newMove(game.player, start_l, start_c, start_l+1, start_c);
     }
   }
   allPlays[playCount] = NULL;
@@ -223,7 +223,9 @@ char *getBestPlay(info *game){
       if(game->table[i][j]==game->player){
         playList = getAllPlays(*game, i, j);
         for(int p = 0; playList[p] != NULL; p++){
-          if(best==NULL || playList[p]->score>best->score){
+          if(best==NULL || playList[p]->score>best->score ||
+         (playList[p]->move[2]=='s' && best->move[2]=='m') ||
+         (playList[p]->move[2]=='s' && playList[p]->move[4]>best->move[4])){
             best = playList[p];
           }
         }

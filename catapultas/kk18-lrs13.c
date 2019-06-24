@@ -234,7 +234,6 @@ char *getBestPlay(info *game){
     }
   }
 
-  puts(best->move);
   return best->move;
 }
 
@@ -279,18 +278,6 @@ void updateGame(info *game, char *buf){
   game->o = o;
 }
 
-void printGame(info *game){
-  printf("Peças Jogador x: %d\n", game->x);
-  printf("Peças Jogador o: %d\n", game->o);
-  puts("Tabuleiro:");
-  for(int i=0; i<SIDSIZ; i++){
-    for(int j=0; j<SIDSIZ; j++){
-      printf("%c ", game->table[i][j]);
-    }
-    puts("");
-  }
-}
-
 int main(int argc, char **argv) {
   char buf[MAXSTR];
   info *gameInfo = newInfo(argc, argv);
@@ -299,7 +286,6 @@ int main(int argc, char **argv) {
 
   while(1) {
     updateGame(gameInfo, buf);
-    // printGame(gameInfo);
 
     sprintf(buf, "%s\n", getBestPlay(gameInfo));
 
